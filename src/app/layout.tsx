@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionWrapper from "./components/SessionWrapper";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,9 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <body className={inter.className}>
-        <SessionWrapper>{children}</SessionWrapper>
+        <ErrorBoundary>
+          <SessionWrapper>
+            {children}
+          </SessionWrapper>
+        </ErrorBoundary>
       </body>
     </html>
   );

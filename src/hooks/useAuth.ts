@@ -2,6 +2,8 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { AuthContextType } from "@/types/auth";
+import { IAuthService, AuthServiceFactory } from "@/services/AuthService";
+import { useMemo } from "react";
 
 /**
  * Custom authentication hook
@@ -10,13 +12,28 @@ import { AuthContextType } from "@/types/auth";
  */
 export function useAuth(): AuthContextType {
   const { data: session, status } = useSession();
+  
+  // Dependency Injection: Service'i factory'den al
+  const authService: IAuthService = useMemo(() => {
+    return AuthServiceFactory.create();
+  }, []);
 
   const handleSignIn = async () => {
-    await signIn("auth0");
+    try {
+      await authService.login();
+    } catch (error) {
+      console.error("Giriş hook hatası:", error);
+      throw error;
+    }
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Çıkış hook hatası:", error);
+      throw error;
+    }
   };
 
   return {
@@ -30,7 +47,7 @@ export function useAuth(): AuthContextType {
 /**
  * Auth durumunu kontrol eden utility hook
  */
-export function useRequireAuth() {
+export function useAuthStatus() {
   const { status, user } = useAuth();
   
   return {
@@ -38,5 +55,19 @@ export function useRequireAuth() {
     isAuthenticated: status === "authenticated",
     isUnauthenticated: status === "unauthenticated",
     user,
+  };
+}
+
+/**
+ * Protected route hook
+ * Single Responsibility: Sadece yetki kontrolü
+ */
+export function useRequireAuth() {
+  const { isAuthenticated, isLoading } = useAuthStatus();
+  
+  return {
+    isAllowed: isAuthenticated,
+    isLoading,
+    shouldRedirect: !isLoading && !isAuthenticated
   };
 } 
