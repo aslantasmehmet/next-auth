@@ -1,4 +1,5 @@
 import { DefaultSession, Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 /**
  * NextAuth Session tipini genişletiyoruz
@@ -13,6 +14,7 @@ declare module "next-auth" {
       image?: string;
       role?: "admin" | "user";
     } & DefaultSession["user"];
+    accessToken?: string;
   }
 
   interface User {
@@ -24,6 +26,11 @@ declare module "next-auth" {
   }
 }
 
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string;
+  }
+}
 
 /**
  * Auth durumları için type definitions
