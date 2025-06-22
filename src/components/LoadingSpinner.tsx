@@ -19,7 +19,7 @@ export default function LoadingSpinner({
   };
 
   const content = (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center" data-testid="loading-spinner">
       <div className={`animate-spin rounded-full border-b-2 border-indigo-600 ${sizeClasses[size]}`}></div>
       {message && (
         <p className="mt-4 text-gray-600 text-sm">{message}</p>

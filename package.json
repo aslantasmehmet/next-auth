@@ -12,12 +12,12 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:all": "node scripts/test-validation.js",
+    "validate-env": "node scripts/validate-env.js",
     "docker:build": "docker build -t next-auth-app .",
-    "docker:run": "docker run -p 3000:3000 --env-file .env.local next-auth-app",
-    "docker:compose:up": "docker-compose up --build",
+    "docker:run": "docker run -p 3000:3000 next-auth-app",
+    "docker:compose": "docker-compose up --build",
     "docker:compose:down": "docker-compose down",
     "health-check": "curl -f http://localhost:3000/api/health || exit 1",
-    "validate-env": "node -e \"require('./src/lib/config')\"",
     "prestart": "npm run validate-env"
   },
   "dependencies": {

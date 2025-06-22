@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
                   <p className="mb-2">Bu sistem <strong>static admin configuration</strong> kullanır:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Super Admin: Kod seviyesinde tanımlı, değiştirilemez</li>
-                    <li>Static Admin'ler: <code>RoleService.ts</code> dosyasında tanımlı</li>
+                    <li>Static Admin&apos;ler: <code>RoleService.ts</code> dosyasında tanımlı</li>
                     <li>Production ortamında güvenli ve stabil çalışır</li>
                     <li>Database bağımlılığı yok, performanslı</li>
                   </ul>
@@ -95,18 +95,18 @@ export default function AdminUsersPage() {
             </h2>
             <div className="space-y-3">
               <div className="bg-gray-800 text-green-400 p-3 rounded-md font-mono text-sm">
-                <div className="text-gray-300 mb-1">// src/services/RoleService.ts</div>
+                <div className="text-gray-300 mb-1">{/* src/services/RoleService.ts */}</div>
                 <div>private static readonly STATIC_ADMINS = [</div>
-                <div className="pl-4 text-yellow-400">'new-admin@company.com',  // ← Buraya ekle</div>
-                <div className="pl-4 text-yellow-400">'another-admin@company.com',</div>
+                <div className="pl-4 text-yellow-400">{`'new-admin@company.com',  // ← Buraya ekle`}</div>
+                <div className="pl-4 text-yellow-400">{`'another-admin@company.com',`}</div>
                 <div>];</div>
               </div>
               <div className="text-sm text-gray-600">
                 <p><strong>Adımlar:</strong></p>
                 <ol className="list-decimal pl-5 space-y-1 mt-2">
-                  <li>Yeni admin email'ini <code>STATIC_ADMINS</code> array'ine ekle</li>
+                  <li>Yeni admin email&apos;ini <code>STATIC_ADMINS</code> array&apos;ine ekle</li>
                   <li>Uygulamayı yeniden başlat</li>
-                  <li>Kullanıcı Auth0'da o email ile kayıt olsun</li>
+                  <li>Kullanıcı Auth0&apos;da o email ile kayıt olsun</li>
                   <li>Otomatik olarak admin yetkisi alır</li>
                 </ol>
               </div>
@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
           {/* Current Admin List */}
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Mevcut Admin'ler ({admins.length})
+              Mevcut Admin&apos;ler ({admins.length})
             </h2>
             <div className="space-y-3">
               {admins.map((admin, index) => (
@@ -185,7 +185,7 @@ export default function AdminUsersPage() {
                     <li><strong>Static Admin System:</strong> Performanslı ve güvenli</li>
                     <li><strong>No Database Dependency:</strong> Hızlı başlangıç</li>
                     <li><strong>Production Ready:</strong> Enterprise projeler için uygun</li>
-                    <li><strong>Version Control:</strong> Admin değişiklikleri git'te takip edilir</li>
+                    <li><strong>Version Control:</strong> Admin değişiklikleri git&apos;te takip edilir</li>
                     <li><strong>Rollback Safety:</strong> Hatalı admin ekleme durumunda kolay geri alma</li>
                   </ul>
                 </div>
