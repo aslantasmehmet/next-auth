@@ -1,35 +1,95 @@
 import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-// Korumalı sayfalar için middleware
+/**
+ * Role-based middleware with NextAuth JWT integration
+ * Protects routes based on authentication status and user roles
+ */
 export default withAuth(
-  function middleware(req) {
-    // Her korumalı route erişiminde log tutuyoruz
-    console.log("Korumalı sayfa erişimi:", req.nextUrl.pathname)
-    console.log("Kullanıcı token:", req.nextauth.token ? "Var" : "Yok")
+  function middleware(req: NextRequest & { nextauth: { token: any } }) {
+    const { pathname } = req.nextUrl
+    const token = req.nextauth.token
+
+    // Admin route protection
+    if (pathname.startsWith("/admin")) {
+      if (!token?.role || token.role !== "admin") {
+        // Redirect non-admin users to dashboard
+        return NextResponse.redirect(new URL("/dashboard", req.url))
+      }
+    }
+
+    // Analytics route protection (admin only)
+    if (pathname.startsWith("/dashboard/analytics")) {
+      if (!token?.permissions?.canViewAnalytics) {
+        return NextResponse.redirect(new URL("/dashboard", req.url))
+      }
+    }
+
+    // User management route protection (admin only)
+    if (pathname.startsWith("/dashboard/users")) {
+      if (!token?.permissions?.canManageUsers) {
+        return NextResponse.redirect(new URL("/dashboard", req.url))
+      }
+    }
+
+    // Profile editing protection
+    if (pathname.startsWith("/profile/edit")) {
+      if (!token?.permissions?.canEditProfile) {
+        return NextResponse.redirect(new URL("/profile", req.url))
+      }
+    }
+
+    return NextResponse.next()
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
         
-        // Token varsa erişim izni ver
-        if (token) {
-          console.log("Token geçerli, erişim izni verildi:", pathname)
+        // Public routes - no authentication required
+        const publicRoutes = ["/", "/login"]
+        if (publicRoutes.includes(pathname)) {
           return true
         }
+
+        // Protected routes - require authentication
+        const protectedRoutes = [
+          "/dashboard",
+          "/profile", 
+          "/admin",
+          "/api/user"
+        ]
         
-        console.log("Token yok, erişim reddedildi:", pathname)
-        return false
+        const isProtectedRoute = protectedRoutes.some(route => 
+          pathname.startsWith(route)
+        )
+
+        if (isProtectedRoute) {
+          // Must be authenticated and have active account
+          return !!token && token.isActive !== false
+        }
+
+        // Default: allow access
+        return true
       },
     },
   }
 )
 
-// Hangi sayfalar korunacak
+/**
+ * Middleware configuration
+ * Defines which routes should be processed by the middleware
+ */
 export const config = {
   matcher: [
+    // Protected dashboard routes
     "/dashboard/:path*",
-    "/profile/:path*",
-    "/admin/:path*"
+    // Profile routes
+    "/profile/:path*", 
+    // Admin routes
+    "/admin/:path*",
+    // API routes that need auth
+    "/api/user/:path*",
   ]
 } 

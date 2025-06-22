@@ -56,11 +56,12 @@ class Logger {
   }
 
   // Authentication specific logging methods
-  authSuccess(userId: string, provider: string) {
+  authSuccess(userId: string, provider: string, additionalMeta?: Record<string, any>) {
     this.info('Authentication successful', {
       userId,
       provider,
-      event: 'auth_success'
+      event: 'auth_success',
+      ...additionalMeta
     });
   }
 

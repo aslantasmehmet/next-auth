@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStatus } from "@/hooks/useAuth";
-import Navigation from "../components/Navigation";
+import Navigation from "@/components/Navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function DashboardPage() {
@@ -27,7 +27,7 @@ export default function DashboardPage() {
       
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Ana başlık */}
-        <DashboardHeader userName={user?.name} />
+        <DashboardHeader userName={user?.name || undefined} />
 
         {/* Kullanıcı bilgileri */}
         <UserInfoCard user={user} />

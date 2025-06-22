@@ -1,11 +1,11 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import Navigation from "./components/Navigation";
+import Navigation from "@/components/Navigation";
 import Link from "next/link";
 
 export default function HomePage() {
-  const { user, status } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -17,25 +17,26 @@ export default function HomePage() {
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Next.js 14 + <span className="text-indigo-600">Auth0</span><br />OAuth + JWT
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            NextAuth, TypeScript ve TailwindCSS ile güvenli kimlik doğrulama sistemi.
-            SOLID prensipleri ve 12Factor metodolojisi kullanıldı.
+          <p className="mt-6 text-lg text-gray-600 max-w-3xl mx-auto">
+            Modern Next.js 14 App Router ile güvenli kimlik doğrulama sistemi. 
+            Auth0 OAuth entegrasyonu ve JWT tabanlı oturum yönetimi ile 
+            kullanıcılarınızın verilerini koruyun.
           </p>
           
-          {status === "unauthenticated" && (
+          {!isLoading && !isAuthenticated && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg text-lg font-semibold">
                 Başlayın
               </Link>
-              <a href="https://github.com/your-username/next-auth" target="_blank" rel="noopener noreferrer" className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg text-lg font-semibold">
-                GitHub'da Görüntüle
+              <a href="https://github.com/aslantasmehmet/next-auth" target="_blank" rel="noopener noreferrer" className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg text-lg font-semibold">
+                GitHub&apos;da Görüntüle
               </a>
             </div>
           )}
         </div>
 
         {/* Hoş geldin mesajı */}
-        {status === "authenticated" && user && (
+        {isAuthenticated && user && (
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-16 border border-gray-100">
             <div className="text-center">
               <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -49,7 +50,7 @@ export default function HomePage() {
               <p className="text-gray-600 mb-6">JWT token ile başarıyla giriş yaptınız</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/dashboard" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold">
-                  Dashboard'a Git
+                  Dashboard&apos;a Git
                 </Link>
                 <Link href="/profile" className="border border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-lg font-semibold">
                   Profili Görüntüle
@@ -111,6 +112,12 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+
+        <p className="text-lg text-gray-600 mb-8">
+          Endüstri standardı güvenlik protokolleri ile korunan, 
+          ölçeklenebilir kimlik doğrulama çözümü. SOLID prensipleri 
+          ve 12Factor metodolojisi ile geliştirildi.
+        </p>
       </main>
     </div>
   );

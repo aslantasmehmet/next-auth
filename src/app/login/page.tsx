@@ -13,24 +13,24 @@ import Image from "next/image";
  */
 
 export default function LoginPage() {
-  const { signIn, status, user } = useAuth();
+  const { signIn, isLoading, isAuthenticated, user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Giriş yapmışsa dashboard'a yönlendir
   useEffect(() => {
-    if (status === "authenticated" && user) {
+    if (isAuthenticated && user) {
       router.push("/dashboard");
     }
-  }, [status, user, router]);
+  }, [isAuthenticated, user, router]);
 
   const handleLogin = async () => {
     setLoading(true);
     setError("");
     
     try {
-      await signIn();
+      signIn();
     } catch (err) {
       setError("Giriş yapılamadı. Tekrar deneyin.");
       console.error("Login hatası:", err);
@@ -40,7 +40,7 @@ export default function LoginPage() {
   };
 
   // Yükleniyor durumu
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -60,7 +60,7 @@ export default function LoginPage() {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Hoş Geldiniz</h2>
-            <p className="text-gray-600">Güvenli dashboard'a erişim için giriş yapın</p>
+            <p className="text-gray-600">Güvenli dashboard&apos;a erişim için giriş yapın</p>
           </div>
 
           {/* Hata mesajı */}
@@ -111,6 +111,13 @@ export default function LoginPage() {
               <span>Uçtan uca şifreli</span>
             </div>
           </div>
+
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Hesabınız yok mu?{" "}
+            <span className="font-medium text-blue-600">
+              Auth0 ile otomatik hesap oluşturulacak
+            </span>
+          </p>
         </div>
 
         {/* Teknoloji bilgisi */}

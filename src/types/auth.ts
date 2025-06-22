@@ -1,4 +1,4 @@
-import { DefaultSession, Session } from "next-auth";
+import { DefaultSession, DefaultUser } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
 /**
@@ -7,13 +7,7 @@ import { JWT } from "next-auth/jwt";
  */
 declare module "next-auth" {
   interface Session {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      image?: string;
-      role?: "admin" | "user";
-    } & DefaultSession["user"];
+    user: ExtendedUser;
     accessToken?: string;
   }
 
@@ -22,13 +16,19 @@ declare module "next-auth" {
     email: string;
     name: string;
     image?: string;
-    role?: "admin" | "user";
+    role: UserRole;
+    permissions: UserPermissions;
+    lastLogin?: Date;
+    isActive: boolean;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken?: string;
+    role: UserRole;
+    permissions: UserPermissions;
+    isActive: boolean;
   }
 }
 
@@ -40,15 +40,37 @@ export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 /**
  * User role types
  */
-export type UserRole = "admin" | "user";
+export type UserRole = 'admin' | 'user';
 
+/**
+ * Kullanıcı yetkileri
+ */
+export interface UserPermissions {
+  canManageUsers: boolean;
+  canViewAnalytics: boolean;
+  canEditProfile: boolean;
+  canAccessAdmin: boolean;
+}
+
+/**
+ * Genişletilmiş kullanıcı bilgileri
+ */
+export interface ExtendedUser extends DefaultUser {
+  role: UserRole;
+  permissions: UserPermissions;
+  lastLogin?: Date;
+  isActive: boolean;
+}
 
 /**
  * Auth context interface
  */
 export interface AuthContextType {
-  status: AuthStatus;
-  user: Session["user"] | null;
-  signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
+  user: ExtendedUser | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  hasRole: (role: UserRole) => boolean;
+  hasPermission: (permission: keyof UserPermissions) => boolean;
+  signIn: () => void;
+  signOut: () => void;
 } 

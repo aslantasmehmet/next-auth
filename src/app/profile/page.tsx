@@ -1,14 +1,14 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import Navigation from "../components/Navigation";
+import Navigation from "@/components/Navigation";
 import { useState } from "react";
 
 export default function ProfilePage() {
-  const { user, status } = useAuth();
+  const { user, isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>

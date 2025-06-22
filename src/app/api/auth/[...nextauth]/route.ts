@@ -4,12 +4,15 @@ import Auth0Provider from "next-auth/providers/auth0";
 // 12Factor App integration
 import { config } from "@/lib/config";
 import { logger } from "@/lib/logger";
+// Role-based authorization
+import { RoleServiceFactory } from "@/services/RoleService";
+import { UserRole, ExtendedUser } from "@/types/auth";
 
 /**
  * NextAuth yapılandırması
  * Auth0 sağlayıcısı ile kimlik doğrulama sağlanıyor.
  * Oturum yönetimi JWT (JSON Web Token) ile yapılıyor.
- * Gizli anahtar ve Auth0 bilgileri ortam değişkenlerinden okunuyor.
+ * Rol tabanlı yetkilendirme sistemi entegre edildi.
  */
 const authOptions: AuthOptions = {
   providers: [
@@ -23,28 +26,53 @@ const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, account, profile }) {
-      if (account) {
-        // Log successful authentication
+    async jwt({ token, account, profile, user }) {
+      if (account && user?.email) {
+        // Role service ile kullanıcı rolünü belirle
+        const roleService = RoleServiceFactory.getInstance();
+        const userRole = await roleService.getUserRole(user.email);
+        const permissions = roleService.getPermissions(userRole);
+
+        // Log successful authentication with role
         logger.authSuccess(
-          profile?.sub || 'unknown',
-          account.provider
+          profile?.sub || user.email,
+          account.provider,
+          { role: userRole }
         );
         
+        // JWT token'a rol bilgilerini ekle
         token.accessToken = account.access_token;
+        token.role = userRole;
+        token.permissions = permissions;
+        token.isActive = true;
       }
       return token;
     },
     async session({ session, token }) {
-      // Pass the access token to the session for API calls
-      session.accessToken = token.accessToken;
+      if (session.user && token.role) {
+        // Session'a rol bilgilerini ekle
+        const extendedUser: ExtendedUser = {
+          ...session.user,
+          role: token.role,
+          permissions: token.permissions,
+          isActive: token.isActive,
+          lastLogin: new Date(),
+        };
+        
+        session.user = extendedUser;
+        session.accessToken = token.accessToken;
+      }
       return session;
     },
     async signIn({ user, account, profile }) {
       try {
-        logger.info('Sign-in attempt', {
+        const roleService = RoleServiceFactory.getInstance();
+        const userRole = user.email ? await roleService.getUserRole(user.email) : 'user';
+        
+        logger.info('Sign-in attempt with role', {
           provider: account?.provider,
           email: user.email,
+          role: userRole,
           event: 'signin_attempt'
         });
         return true;
