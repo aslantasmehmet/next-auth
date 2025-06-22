@@ -7,13 +7,24 @@ export interface IRoleService {
   hasPermission(user: ExtendedUser, permission: keyof UserPermissions): boolean;
   isAdmin(user: ExtendedUser): boolean;
   canAccessRoute(user: ExtendedUser, route: string): boolean;
+  // Admin management methods
+  addAdmin(email: string): Promise<boolean>;
+  removeAdmin(email: string): Promise<boolean>;
+  getAllAdmins(): Promise<string[]>;
+  isSuperAdmin(email: string): boolean;
 }
 
 // Single Responsibility Principle - Role configuration
 class RoleConfiguration {
-  private static readonly ADMIN_EMAILS = [
-    'admin@example.com',
-    'kayra@admin.com', // Demo admin email
+  // Super Admin - İlk admin (değiştirilemez)
+  private static readonly SUPER_ADMIN_EMAIL = 'super@admin.com';
+  
+  // Static admin listesi (server-side için) - admin panelden eklenen emailler buraya elle eklenir
+  private static readonly STATIC_ADMINS = [
+    // Örnek: admin panelden eklediğin email'leri buraya ekle
+    // 'test@example.com',
+    // 'admin@company.com',
+    'kayra@admin.com',
   ];
 
   private static readonly ROLE_PERMISSIONS: Record<UserRole, UserPermissions> = {
@@ -31,8 +42,22 @@ class RoleConfiguration {
     },
   };
 
+  static isSuperAdmin(email: string): boolean {
+    return email.toLowerCase() === this.SUPER_ADMIN_EMAIL.toLowerCase();
+  }
+
+  static getDynamicAdmins(): string[] {
+    // Static sistem - sadece tanımlı admin'leri döndür
+    return this.STATIC_ADMINS;
+  }
+
   static isAdminEmail(email: string): boolean {
-    return this.ADMIN_EMAILS.includes(email.toLowerCase());
+    // Super admin check
+    if (this.isSuperAdmin(email)) return true;
+    
+    // Static admin check
+    const staticAdmins = this.getDynamicAdmins();
+    return staticAdmins.includes(email.toLowerCase());
   }
 
   static getPermissions(role: UserRole): UserPermissions {
@@ -87,6 +112,32 @@ export class RoleService implements IRoleService {
     }
 
     return true; // Public routes
+  }
+
+  // Admin management methods - Static system only
+  async addAdmin(email: string): Promise<boolean> {
+    // Static system - kod seviyesinde manual ekleme gerekli
+    console.log('🔧 STATIC ADMIN EKLEME TALİMATI:');
+    console.log(`1. src/services/RoleService.ts dosyasını aç`);
+    console.log(`2. STATIC_ADMINS array'ine ekle: '${email.toLowerCase()}',`);
+    console.log(`3. Uygulamayı yeniden başlat`);
+    return false; // UI'da manual talimat görünür
+  }
+
+  async removeAdmin(email: string): Promise<boolean> {
+    console.log('🔧 STATIC ADMIN ÇIKARMA TALİMATI:');
+    console.log(`1. src/services/RoleService.ts dosyasını aç`);
+    console.log(`2. STATIC_ADMINS array'inden kaldır: '${email.toLowerCase()}',`);
+    console.log(`3. Uygulamayı yeniden başlat`);
+    return false; // UI'da manual talimat görünür
+  }
+
+  async getAllAdmins(): Promise<string[]> {
+    return RoleConfiguration.getDynamicAdmins();
+  }
+
+  isSuperAdmin(email: string): boolean {
+    return RoleConfiguration.isSuperAdmin(email);
   }
 }
 

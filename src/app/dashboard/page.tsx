@@ -27,7 +27,7 @@ export default function DashboardPage() {
       
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Ana başlık */}
-        <DashboardHeader userName={user?.name || undefined} />
+        <DashboardHeader userName={user?.name || undefined} user={user} />
 
         {/* Kullanıcı bilgileri */}
         <UserInfoCard user={user} />
@@ -40,18 +40,31 @@ export default function DashboardPage() {
 }
 
 // Header Component - Single Responsibility: Sadece başlık gösterimi
-function DashboardHeader({ userName }: { userName?: string }) {
+function DashboardHeader({ userName, user }: { userName?: string; user?: any }) {
+  const isAdmin = user?.role === 'admin';
+  
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="border-4 border-dashed border-gray-200 rounded-lg p-8">
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="h-10 w-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+          <div className={`mx-auto h-20 w-20 ${isAdmin ? 'bg-red-100' : 'bg-indigo-100'} rounded-full flex items-center justify-center mb-4`}>
+            {isAdmin ? (
+              <span className="text-3xl">👑</span>
+            ) : (
+              <svg className="h-10 w-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Hoş geldin, {userName || "Kullanıcı"}! Bu korumalı bir sayfa.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
+          </h1>
+          <p className="text-gray-600">
+            {isAdmin 
+              ? `Hoş geldin, ${userName || "Admin"}! Admin yetkilerinle sistemi yönetebilirsin.`
+              : `Hoş geldin, ${userName || "Kullanıcı"}! Bu korumalı bir sayfa.`
+            }
+          </p>
         </div>
       </div>
     </div>
@@ -60,6 +73,23 @@ function DashboardHeader({ userName }: { userName?: string }) {
 
 // User Info Card - Single Responsibility: Kullanıcı bilgi gösterimi
 function UserInfoCard({ user }: { user: any }) {
+  // User role belirleme
+  const getUserRole = () => {
+    if (!user?.role) return "Kullanıcı";
+    
+    const roleTranslations = {
+      'admin': '👑 Admin',
+      'user': 'Kullanıcı'
+    };
+    
+    return roleTranslations[user.role as keyof typeof roleTranslations] || "Kullanıcı";
+  };
+
+  const getRoleBadgeColor = () => {
+    if (user?.role === 'admin') return "red";
+    return "blue";
+  };
+
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="bg-white rounded-lg shadow p-6">
@@ -68,7 +98,11 @@ function UserInfoCard({ user }: { user: any }) {
           <InfoItem label="İsim" value={user?.name || "Belirtilmemiş"} />
           <InfoItem label="E-posta" value={user?.email || "Belirtilmemiş"} />
           <InfoItem label="Giriş Durumu" value="Aktif" badge="green" />
-          <InfoItem label="Yetki Seviyesi" value="Kullanıcı" badge="blue" />
+          <InfoItem 
+            label="Yetki Seviyesi" 
+            value={getUserRole()} 
+            badge={getRoleBadgeColor()} 
+          />
         </div>
       </div>
     </div>
@@ -79,11 +113,12 @@ function UserInfoCard({ user }: { user: any }) {
 function InfoItem({ label, value, badge }: { 
   label: string; 
   value: string; 
-  badge?: "green" | "blue" 
+  badge?: "green" | "blue" | "red"
 }) {
   const badgeClasses = {
     green: "bg-green-100 text-green-800",
-    blue: "bg-blue-100 text-blue-800"
+    blue: "bg-blue-100 text-blue-800",
+    red: "bg-red-100 text-red-800"
   };
 
   return (
