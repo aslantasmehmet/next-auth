@@ -2,34 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAdminAuth } from "@/hooks/useAuth";
-import LoadingSpinner from "./LoadingSpinner";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { 
-    user, 
-    isLoading, 
-    isAuthenticated, 
-    isAdmin, 
-    canAccessAdmin, 
-    signIn, 
-    signOut 
-  } = useAdminAuth();
-
-  if (isLoading) {
-    return (
-      <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <LoadingSpinner />
-            </div>
-          </div>
-        </div>
-      </nav>
-    );
-  }
+  const { data: session, status } = useSession();
+  
+  const isAuthenticated = status === "authenticated";
+  const user = session?.user as any;
+  const isAdmin = user?.role === 'admin';
 
   return (
     <nav className="bg-white shadow-lg">
@@ -62,7 +43,7 @@ export default function Navigation() {
                   >
                     Profil
                   </Link>
-                  {canAccessAdmin && (
+                  {isAdmin && (
                     <Link
                       href="/admin"
                       className="border-transparent text-red-500 hover:border-red-300 hover:text-red-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -105,19 +86,19 @@ export default function Navigation() {
                   )}
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
                   Çıkış Yap
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => signIn()}
+              <Link
+                href="/login"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
               >
                 Giriş Yap
-              </button>
+              </Link>
             )}
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
@@ -164,7 +145,7 @@ export default function Navigation() {
                 >
                   Profil
                 </Link>
-                {canAccessAdmin && (
+                {isAdmin && (
                   <Link
                     href="/admin"
                     className="border-transparent text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
@@ -177,48 +158,52 @@ export default function Navigation() {
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
             {isAuthenticated ? (
-              <div className="flex items-center px-4">
-                <div className="flex-shrink-0">
-                  {user?.image && (
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={user.image}
-                      alt={user.name || 'User'}
-                    />
-                  )}
-                </div>
-                <div className="ml-3">
-                  <div className="text-base font-medium text-gray-800">
-                    {user?.name}
+              <div>
+                <div className="flex items-center px-4 mb-3">
+                  <div className="flex-shrink-0">
+                    {user?.image && (
+                      <img
+                        className="h-10 w-10 rounded-full"
+                        src={user.image}
+                        alt={user.name || 'User'}
+                      />
+                    )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-sm font-medium text-gray-500">
-                      {user?.email}
+                  <div className="ml-3">
+                    <div className="text-base font-medium text-gray-800">
+                      {user?.name}
                     </div>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      isAdmin 
-                        ? 'bg-red-100 text-red-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {isAdmin ? 'Admin' : 'Kullanıcı'}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm font-medium text-gray-500">
+                        {user?.email}
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        isAdmin 
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {isAdmin ? 'Admin' : 'Kullanıcı'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => signOut()}
-                  className="ml-auto flex-shrink-0 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Çıkış
-                </button>
+                <div className="px-4">
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  >
+                    Çıkış Yap
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="px-4">
-                <button
-                  onClick={() => signIn()}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                <Link
+                  href="/login"
+                  className="block w-full text-left bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
                   Giriş Yap
-                </button>
+                </Link>
               </div>
             )}
           </div>

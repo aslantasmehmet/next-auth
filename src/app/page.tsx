@@ -5,7 +5,7 @@ import Navigation from "@/components/Navigation";
 import Link from "next/link";
 
 export default function HomePage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -23,9 +23,9 @@ export default function HomePage() {
             kullanıcılarınızın verilerini koruyun.
           </p>
           
-          {!isLoading && !isAuthenticated && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg text-lg font-semibold">
+          {!isAuthenticated && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <Link href="/login" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold">
                 Başlayın
               </Link>
               <a href="https://github.com/aslantasmehmet/next-auth" target="_blank" rel="noopener noreferrer" className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg text-lg font-semibold">
