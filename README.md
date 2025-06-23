@@ -1,36 +1,169 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js 14 + Auth0 OAuth + JWT Authentication System
 
-## Getting Started
+A modern, secure authentication system built with Next.js 14 App Router, Auth0 OAuth, and JWT token management. Features role-based authorization with admin/user differentiation and enterprise-grade security.
 
-First, run the development server:
+## Features
 
+- **Secure Authentication**: Auth0 OAuth integration with JWT tokens
+- **Role-Based Authorization**: Admin and User roles with different permissions
+- **Modern UI**: Clean, responsive design with TailwindCSS
+- **Enterprise Ready**: SOLID principles and 12Factor App compliance
+- **Production Ready**: Docker support with multi-stage builds
+- **Type Safe**: Full TypeScript implementation
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Authentication**: NextAuth.js + Auth0 OAuth
+- **Styling**: TailwindCSS
+- **Architecture**: SOLID Principles, Clean Architecture
+- **Deployment**: Docker, Docker Compose
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Auth0 account
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd next-auth
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Environment Configuration**
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Edit `.env.local` with your Auth0 credentials:
+```env
+AUTH0_CLIENT_ID=your_auth0_client_id
+AUTH0_CLIENT_SECRET=your_auth0_client_secret
+AUTH0_ISSUER=https://your-domain.auth0.com
+NEXTAUTH_SECRET=your_32_character_secret_key
+NEXTAUTH_URL=http://localhost:3000
+```
 
-## Learn More
+4. **Run Development Server**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Visit `http://localhost:3000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Role-Based Authorization
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The system supports two user roles with different capabilities:
 
-## Deploy on Vercel
+### Admin Users
+- Full system access
+- Admin Panel access (`/admin`)
+- User management capabilities
+- Analytics and system monitoring
+- Distinguished with red role badges and crown icon
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Regular Users  
+- Dashboard access (`/dashboard`)
+- Profile management (`/profile`)
+- Personal data viewing
+- Blue role badges
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Admin Configuration
+
+### Default Admin Account
+
+For testing purposes, the following email is pre-configured as admin:
+```
+super@admin.com
+```
+
+### Adding Custom Admin Users
+
+To configure additional admin users, modify the `RoleService` in `src/services/RoleService.ts`:
+
+```typescript
+// Add your admin emails to this array
+const ADMIN_EMAILS = [
+  'super@admin.com',
+  'your-admin@company.com',
+  'another-admin@domain.com'
+];
+```
+
+### Role Assignment Logic
+
+- **Admin Role**: Users with emails listed in `ADMIN_EMAILS` array
+- **User Role**: All other authenticated users (default)
+
+The role assignment happens automatically during the authentication process and is stored in the JWT token for session management.
+
+## Docker Deployment
+
+### Development
+```bash
+docker-compose up --build
+```
+
+### Production
+```bash
+docker build -t nextauth-app .
+docker run -p 3000:3000 nextauth-app
+```
+
+## Project Structure
+
+```
+src/
+├── app/                 # Next.js 14 App Router
+│   ├── api/auth/       # NextAuth API routes
+│   ├── dashboard/      # Protected dashboard
+│   ├── profile/        # User profile page
+│   └── login/          # Login page
+├── components/         # Reusable UI components
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and config
+└── services/           # Business logic services
+│   └── RoleService.ts  # Role management logic
+```
+
+## Security Features
+
+- **JWT Token Management**: Secure session handling
+- **Route Protection**: Middleware-based authentication
+- **Role Validation**: Server-side permission checks
+- **Environment Validation**: Runtime config verification
+- **HTTPS Enforcement**: Production security headers
+
+## Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run integration tests
+npm run test:integration
+
+# Run E2E tests
+npm run test:e2e
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build production application
+- `npm run start` - Start production server
+- `npm run test` - Run test suite
+- `npm run lint` - Run ESLint
+- `npm run validate-env` - Validate environment variables
+
+**Built with modern web technologies for scalable, secure authentication.**
