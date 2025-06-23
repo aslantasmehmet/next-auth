@@ -17,14 +17,14 @@ export interface IRoleService {
 // Single Responsibility Principle - Role configuration
 class RoleConfiguration {
   // Super Admin - İlk admin (değiştirilemez)
-  private static readonly SUPER_ADMIN_EMAIL = 'super@admin.com';
+  private static readonly SUPER_ADMIN_EMAIL = 'kayraexport@testadmin.com';
   
   // Static admin listesi (server-side için) - admin panelden eklenen emailler buraya elle eklenir
   private static readonly STATIC_ADMINS = [
     // Örnek: admin panelden eklediğin email'leri buraya ekle
     // 'test@example.com',
     // 'admin@company.com',
-    'kayra@admin.com',
+    'testadmin@testadmin.com',
   ];
 
   private static readonly ROLE_PERMISSIONS: Record<UserRole, UserPermissions> = {

@@ -84,7 +84,7 @@ The system supports two user roles with different capabilities:
 
 For testing purposes, the following email is pre-configured as admin:
 ```
-super@admin.com
+kayraexport@testadmin.com
 ```
 
 ### Adding Custom Admin Users
@@ -94,7 +94,7 @@ To configure additional admin users, modify the `RoleService` in `src/services/R
 ```typescript
 // Add your admin emails to this array
 const ADMIN_EMAILS = [
-  'super@admin.com',
+  'kayraexport@testadmin.com',
   'your-admin@company.com',
   'another-admin@domain.com'
 ];
